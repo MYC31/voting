@@ -1,0 +1,107 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register User</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.3.5/dist/web3.min.js"></script>
+</head>
+<body>
+<h2>Register User</h2>
+<button id="registerUserButton">Register</button>
+<p id="result"></p>
+
+<script>
+    document.getElementById('registerUserButton').addEventListener('click', async () => {
+
+        const formData = new URLSearchParams();
+        // formData.append('account', account);
+        var account;
+        web3.eth.getAccounts(function (error, accounts) { 
+          if (error) {
+            console.log(error);
+          }
+          account = accounts[0];
+        });
+        formData.append("account", account);
+
+        console.log("account: ", account);
+        
+
+        try {
+            const response = await fetch('/registerUser', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formData,
+            });
+            
+            const result = await response.json();
+            document.getElementById('result').innerText = JSON.stringify(result);
+        } catch (error) {
+            document.getElementById('result').innerText = JSON.stringify({ error: error.message });
+        }
+    });
+</script>
+</body>
+</html> -->
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register User</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.3.5/dist/web3.min.js"></script>
+</head>
+<body>
+<h2>Register User</h2>
+<button id="registerUserButton">Register</button>
+<p id="result"></p>
+
+<script>
+    document.getElementById('registerUserButton').addEventListener('click', async () => {
+        if (typeof window.ethereum !== 'undefined') {
+            try {
+                // Request account access if needed
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+                // We now have access to the accounts
+                const web3 = new Web3(window.ethereum);
+                const accounts = await web3.eth.getAccounts();
+                const account = accounts[0];
+
+                const formData = new URLSearchParams();
+                formData.append("account", account);
+
+                console.log("account: ", account);
+
+                try {
+                    const response = await fetch('/registerUser', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: formData,
+                    });
+
+                    const result = await response.json();
+                    document.getElementById('result').innerText = JSON.stringify(result);
+                } catch (error) {
+                    document.getElementById('result').innerText = JSON.stringify({ error: error.message });
+                }
+            } catch (error) {
+                console.error("Error fetching accounts:", error);
+                document.getElementById('result').innerText = JSON.stringify({ error: error.message });
+            }
+        } else {
+            alert('Metamask not detected. Please install Metamask.');
+        }
+    });
+</script>
+</body>
+</html>
+

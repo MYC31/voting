@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Campaign</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.3.5/dist/web3.min.js"></script>
+</head>
+<body>
+<h2>Create Campaign</h2>
+<form id="createCampaignForm" method="post">
+    <label for="reward">Reward (wei):</label>
+    <input type="number" id="reward" name="reward" required><br><br>
+
+    <label for="candidacyFee">Candidacy Fee (wei):</label>
+    <input type="number" id="candidacyFee" name="candidacyFee" required><br><br>
+
+    <label for="endVoteCount">End Vote Count:</label>
+    <input type="number" id="endVoteCount" name="endVoteCount" required><br><br>
+
+    <button type="submit">Create Campaign</button>
+</form>
+<p id="result"></p>
+
+<script>
+    document.getElementById('createCampaignForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const reward = document.getElementById('reward').value;
+        const candidacyFee = document.getElementById('candidacyFee').value;
+        const endVoteCount = document.getElementById('endVoteCount').value;
+
+        try {
+            // Request account access if needed
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+            // We now have access to the accounts
+            const web3 = new Web3(window.ethereum);
+            const accounts = await web3.eth.getAccounts();
+            const account = accounts[0];
+
+            const formData = new URLSearchParams();
+            formData.append('reward', reward);
+            formData.append('candidacyFee', candidacyFee);
+            formData.append('endVoteCount', endVoteCount);
+            formData.append('account', account); // Include account in formData
+
+            const response = await fetch('/createCampaign', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            });
+
+            const result = await response.json();
+            document.getElementById('result').innerText = JSON.stringify(result);
+        } catch (error) {
+            document.getElementById('result').innerText = JSON.stringify({ error: error.message });
+        }
+    });
+</script>
+</body>
+</html>

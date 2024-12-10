@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campaign Details</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.3.5/dist/web3.min.js"></script>
+</head>
+<body>
+    <h2>Campaign Details</h2>
+    <p id="reward">Reward: </p>
+    <p id="candidacyFee">Candidacy Fee: </p>
+    <p id="endVoteCount">End Vote Count: </p>
+    <p id="totalVotes">Total Votes: </p>
+    <p id="candidates">Candidates: </p>
+    <p id="candidatenum">Number of Candidates: </p>
+    <label for="candidateId">Candidate ID:</label>
+    <input type="number" id="candidateId" name="candidateId" required>
+    <button id="vote">Vote</button>
+    <button id="declareCandidacy">Declare Candidacy</button>
+    <script>
+        $(document).ready(function() {
+            $('#vote').on('click', async function() {
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+                // Initialize web3 and get current account
+                const web3 = new Web3(window.ethereum);
+                const accounts = await web3.eth.getAccounts();
+                const account = accounts[0];
+
+                // const reward = document.getElementById('reward').value;
+                const candidateId = $('#candidateId').val();
+                const campaignId = window.campaignId;
+
+                const formData = new URLSearchParams();
+                formData.append("candidateId", candidateId);
+                formData.append("campaignId", campaignId);
+
+                formData.append("account", account);
+
+
+                const response = await fetch('/voting', {
+                    method: 'POST',
+                    headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: formData,
+                });
+
+                const result = await response.json();
+                alert(JSON.stringify(result));
+            });
+
+            $('#declareCandidacy').on('click', async function() {
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+                // Initialize web3 and get current account
+                const web3 = new Web3(window.ethereum);
+                const accounts = await web3.eth.getAccounts();
+                const account = accounts[0];
+
+                const campaignId = window.campaignId;
+
+                console.log("account: ", account);
+                console.log("campaignId: ", campaignId);
+
+                const formData = new URLSearchParams();
+                formData.append("campaignId", campaignId);
+                formData.append("account", account);
+
+                const response = await fetch('/declareCandidacy', {
+                    method: 'POST',
+                    headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: formData,
+                });
+
+                const result = await response.json();
+                alert(JSON.stringify(result));
+            });
+        });
+
+        function setCampaignDetails(details) {
+            $('#reward').text('Reward: ' + details.reward);
+            $('#candidacyFee').text('Candidacy Fee: ' + details.candidacyFee);
+            $('#endVoteCount').text('End Vote Count: ' + details.endVoteCount);
+            $('#totalVotes').text('Total Votes: ' + details.totalVotes);
+            $('#candidates').text('Candidates: ' + details.candidates.join(', '));
+            $('#candidatenum').text('Number of Candidates: ' + details.candidatenum);
+            window.campaignId = details.campaignId;
+        }
+    </script>
+</body>
+</html>
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campaign Details</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.3.5/dist/web3.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h2>Campaign Details</h2>
+    <p id="reward">Reward: </p>
+    <p id="candidacyFee">Candidacy Fee: </p>
+    <p id="endVoteCount">End Vote Count: </p>
+    <p id="totalVotes">Total Votes: </p>
+    <p id="candidates">Candidates: </p>
+    <p id="candidatenum">Number of Candidates: </p>
+    <label for="candidateId">Candidate ID:</label>
+    <input type="number" id="candidateId" name="candidateId" required>
+    <button id="vote">Vote</button>
+    <button id="declareCandidacy">Declare Candidacy</button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Request account access if needed
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+            // Initialize web3 and get current account
+            const web3 = new Web3(window.ethereum);
+            const accounts = await web3.eth.getAccounts();
+            const account = accounts[0];
+
+            $('#vote').on('click', async function() {
+                const candidateId = $('#candidateId').val();
+                const campaignId = window.campaignId;
+
+                const formData = new URLSearchParams();
+                formData.append("candidateId", candidateId);
+                formData.append("campaignId", campaignId);
+                formData.append("account", account);
+
+                try {
+                    const response = await fetch('/voting', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: formData,
+                    });
+
+                    const result = await response.json();
+                    alert(JSON.stringify(result));
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error: ' + error.message);
+                }
+            });
+
+            $('#declareCandidacy').on('click', async function() {
+                const campaignId = window.campaignId;
+                
+                console.log("typeof campaignId: ", typeof campaignId);
+                console.log("campaignId: ", campaignId);
+                console.log("account: ", account);
+
+                const formData = new URLSearchParams();
+                formData.append("campaignId", campaignId);
+                formData.append("account", account);
+
+                try {
+                    const response = await fetch('/declareCandidacy', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: formData,
+                    });
+
+                    const result = await response.json();
+                    alert(JSON.stringify(result));
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error: ' + error.message);
+                }
+            });
+        });
+
+        function setCampaignDetails(details) {
+            $('#reward').text('Reward: ' + details.reward);
+            $('#candidacyFee').text('Candidacy Fee: ' + details.candidacyFee);
+            $('#endVoteCount').text('End Vote Count: ' + details.endVoteCount);
+            $('#totalVotes').text('Total Votes: ' + details.totalVotes);
+            $('#candidates').text('Candidates: ' + details.candidates.join(', '));
+            $('#candidatenum').text('Number of Candidates: ' + details.candidatenum);
+            window.campaignId = details.campaignId;
+        }
+    </script>
+</body>
+</html> -->

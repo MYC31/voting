@@ -1,0 +1,129 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vote</title>
+</head>
+<body>
+<h2>Vote</h2>
+<div id="campaigns"></div>
+<p id="result"></p>
+
+<script>
+    async function fetchCampaigns() {
+        const response = await fetch('/vote');
+        const campaigns = await response.json();
+        const campaignsDiv = document.getElementById('campaigns');
+        campaigns.forEach(campaign => {
+            const campaignElement = document.createElement('div');
+            campaignElement.innerHTML = `
+                    <p>Campaign ID: ${campaign.id}</p>
+                    <p>Creator: ${campaign.creator}</p>
+                    <p>Reward: ${campaign.reward}</p>
+                    <p>Candidacy Fee: ${campaign.candidacyFee}</p>
+                    <p>End Vote Count: ${campaign.endVoteCount}</p>
+                    <p>Total Votes: ${campaign.totalVotes}</p>
+                    <button onclick="vote(${campaign.id})">Vote</button>
+                `;
+            campaignsDiv.appendChild(campaignElement);
+        });
+    }
+
+    async function vote(campaignId) {
+        const candidate = prompt("Enter candidate ID:");
+        const from = prompt("Enter your Ethereum account address:");
+        const value = prompt("Enter the voting value in ether (e.g., 0.1):");
+
+        const response = await fetch(`/vote/campaign/${campaignId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                campaignId,
+                candidate,
+                from,
+                value: web3.utils.toWei(value, 'ether') // Convert ether to wei
+            }),
+        });
+
+        const result = await response.json();
+        document.getElementById('result').innerText = JSON.stringify(result);
+    }
+
+    fetchCampaigns();
+</script>
+</body>
+</html> -->
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vote</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.3.5/dist/web3.min.js"></script>
+</head>
+<body>
+<h2>Vote</h2>
+<div id="campaigns"></div>
+<p id="result"></p>
+
+<script>
+    async function fetchCampaigns() {
+        const response = await fetch('/vote');
+        const campaigns = await response.json();
+        const campaignsDiv = document.getElementById('campaigns');
+        campaigns.forEach(campaign => {
+            const campaignElement = document.createElement('div');
+            campaignElement.innerHTML = `
+                    <p>Campaign ID: ${campaign.id}</p>
+                    <p>Creator: ${campaign.creator}</p>
+                    <p>Reward: ${campaign.reward}</p>
+                    <p>Candidacy Fee: ${campaign.candidacyFee}</p>
+                    <p>End Vote Count: ${campaign.endVoteCount}</p>
+                    <p>Total Votes: ${campaign.totalVotes}</p>
+                    <button onclick="vote(${campaign.id})">Vote</button>
+                `;
+            campaignsDiv.appendChild(campaignElement);
+        });
+    }
+
+    async function vote(campaignId) {
+        const candidate = prompt("Enter candidate ID:");
+        
+        // Request account access if needed
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+        // Initialize web3 and get current account
+        const web3 = new Web3(window.ethereum);
+        const accounts = await web3.eth.getAccounts();
+        const from = accounts[0];
+
+        const value = prompt("Enter the voting value in ether (e.g., 0.1):");
+
+        const response = await fetch(`/vote/campaign/${campaignId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                campaignId,
+                candidate,
+                from,
+                value: web3.utils.toWei(value, 'ether') // Convert ether to wei
+            }),
+        });
+
+        const result = await response.json();
+        document.getElementById('result').innerText = JSON.stringify(result);
+    }
+
+    fetchCampaigns();
+</script>
+</body>
+</html>
+

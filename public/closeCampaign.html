@@ -1,0 +1,98 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Close Campaign</title>
+</head>
+<body>
+<h2>Close Campaign</h2>
+<form id="closeCampaignForm">
+    <label for="campaignId">Campaign ID:</label>
+    <input type="number" id="campaignId" name="campaignId" required><br><br>
+
+    <button type="submit">Close Campaign</button>
+</form>
+<p id="result"></p>
+
+<script>
+    document.getElementById('closeCampaignForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const campaignId = document.getElementById('campaignId').value;
+        // const from = document.getElementById('accountAddress').value;
+
+        const formData = new URLSearchParams();
+        formData.append('campaignId', campaignId);
+
+        const response = await fetch('/closeCampaign', {
+            method: 'POST',
+            headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData,
+        });
+
+        const result = await response.json();
+        document.getElementById('result').innerText = JSON.stringify(result);
+    });
+</script>
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Close Campaign</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.3.5/dist/web3.min.js"></script>
+</head>
+<body>
+<h2>Close Campaign</h2>
+<form id="closeCampaignForm">
+    <label for="campaignId">Campaign ID:</label>
+    <input type="number" id="campaignId" name="campaignId" required><br><br>
+
+    <button type="submit">Close Campaign</button>
+</form>
+<p id="result"></p>
+
+<script>
+    document.getElementById('closeCampaignForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const campaignId = document.getElementById('campaignId').value;
+
+        // Request account access if needed
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+        // Initialize web3 and get current account
+        const web3 = new Web3(window.ethereum);
+        const accounts = await web3.eth.getAccounts();
+        const account = accounts[0];
+
+        const formData = new URLSearchParams();
+        formData.append('campaignId', campaignId);
+        formData.append('account', account);
+
+        try {
+            const response = await fetch('/closeCampaign', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: formData,
+            });
+
+            const result = await response.json();
+            document.getElementById('result').innerText = JSON.stringify(result);
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('result').innerText = JSON.stringify({ error: error.message });
+        }
+    });
+</script>
+</body>
+</html>
